@@ -1,0 +1,60 @@
+# Node modules
+/node_modules/
+
+# Environment files (no subir secretos)
+/.env
+.env.* 
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Build / output
+/dist/
+build/
+out/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+.next/
+
+# TypeScript
+/*.tsbuildinfo
+
+# Editor / OS files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.DS_Store
+Thumbs.db
+
+# Lockfiles (commit package-lock.json if you want reproducible installs)
+# package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Test / coverage
+coverage/
+*.lcov
+
+# Runtime files
+*.pid
+*.seed
+*.sqlite
+*.sqlite3
+
+# Misc
+.env.example
+.env.backup
+.env.local.backup
+*.pem
+*.key
+*.p12
