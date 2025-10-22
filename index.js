@@ -6,6 +6,8 @@ import connectDB from "./config/db.js";
 // Rutas
 import productosRoutes from './src/routes/productoRoutes.js'
 import mesaRoutes from './src/routes/mesaRoutes.js'
+import ordenRoutes from './src/routes/ordenRoutes.js'
+import usuarioRoutes from './src/routes/usuarioRoutes.js'
 // Cargar variables de entorno
 dotenv.config();
 
@@ -18,9 +20,11 @@ app.use(express.json());
 // Conectar a la base de datos
 connectDB();
 
-// Rutas de prueba
+// Rutas de la API
 app.use("/api/productos", productosRoutes);
-app.use("/api/mesas", mesaRoutes)
+app.use("/api/mesas", mesaRoutes);
+app.use("/api/ordenes", ordenRoutes);
+app.use("/api/usuarios", usuarioRoutes);
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;

@@ -6,13 +6,14 @@ import {
   actualizarMesa,
   eliminarMesa,
 } from "../controllers/mesaController.js";
+import { proteger, esAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", crearMesa);
-router.get("/", obtenerMesas);
-router.get("/:id", obtenerMesaPorId);
-router.put("/:id", actualizarMesa);
-router.delete("/:id", eliminarMesa);
+router.post("/", proteger, esAdmin, crearMesa);
+router.get("/", proteger, obtenerMesas);
+router.get("/:id", proteger, obtenerMesaPorId);
+router.put("/:id", proteger, actualizarMesa);
+router.delete("/:id", proteger, esAdmin, eliminarMesa);
 
 export default router;
