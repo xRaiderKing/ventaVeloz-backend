@@ -58,3 +58,6 @@ coverage/
 *.pem
 *.key
 *.p12
+
+PRUEBAS_POSTMAN.md
+API_DOCUMENTATION.md

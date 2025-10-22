@@ -16,6 +16,11 @@ const productoSchema = new mongoose.Schema(
       type: Number,
       required: [true, "El precio es obligatorio"],
     },
+    descripcion: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     disponible: {
       type: Boolean,
       default: true,
