@@ -1,10 +1,5 @@
 import Producto from "../models/producto.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { subirImagen, eliminarImagen, extraerPublicId } from "../config/cloudinary.js";
 
 
 export const crearProducto = async (req, res) => {
@@ -65,11 +60,16 @@ export const eliminarProducto = async (req, res) => {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
 
-    // Eliminar imagen si existe
+    // Eliminar imagen de Cloudinary si existe
     if (producto.imagen) {
-      const imagePath = path.join(__dirname, "../../", producto.imagen);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      const publicId = extraerPublicId(producto.imagen);
+      if (publicId) {
+        try {
+          await eliminarImagen(publicId);
+        } catch (cloudinaryError) {
+          console.error("Error al eliminar imagen de Cloudinary:", cloudinaryError);
+          // Continuamos con la eliminación del producto aunque falle la imagen
+        }
       }
     }
 
@@ -91,35 +91,40 @@ export const subirImagenProducto = async (req, res) => {
 
     const producto = await Producto.findById(id);
     if (!producto) {
-      // Eliminar archivo subido si el producto no existe
-      fs.unlinkSync(req.file.path);
       return res.status(404).json({ message: "Producto no encontrado" });
     }
 
-    // Eliminar imagen anterior si existe
+    // Eliminar imagen anterior de Cloudinary si existe
     if (producto.imagen) {
-      const oldImagePath = path.join(__dirname, "../../", producto.imagen);
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
+      const oldPublicId = extraerPublicId(producto.imagen);
+      if (oldPublicId) {
+        try {
+          await eliminarImagen(oldPublicId);
+        } catch (cloudinaryError) {
+          console.error("Error al eliminar imagen anterior:", cloudinaryError);
+          // Continuamos con la subida de la nueva imagen
+        }
       }
     }
 
-    // Guardar ruta de la nueva imagen
-    const imagePath = `uploads/productos/${req.file.filename}`;
-    producto.imagen = imagePath;
+    // Subir nueva imagen a Cloudinary
+    const result = await subirImagen(req.file.buffer, 'productos');
+    
+    // Guardar URL de Cloudinary en el producto
+    producto.imagen = result.url;
     await producto.save();
 
     res.json({
       message: "Imagen subida correctamente",
-      imagen: imagePath,
+      imagen: result.url,
       producto,
     });
   } catch (error) {
-    // Si hay error, eliminar archivo subido
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
-    res.status(500).json({ message: "Error al subir la imagen", error });
+    console.error("Error al subir imagen:", error);
+    res.status(500).json({ 
+      message: "Error al subir la imagen", 
+      error: error.message 
+    });
   }
 };
 
@@ -137,10 +142,15 @@ export const eliminarImagenProducto = async (req, res) => {
       return res.status(400).json({ message: "El producto no tiene imagen" });
     }
 
-    // Eliminar archivo del servidor
-    const imagePath = path.join(__dirname, "../../", producto.imagen);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
+    // Eliminar imagen de Cloudinary
+    const publicId = extraerPublicId(producto.imagen);
+    if (publicId) {
+      try {
+        await eliminarImagen(publicId);
+      } catch (cloudinaryError) {
+        console.error("Error al eliminar de Cloudinary:", cloudinaryError);
+        // Continuamos actualizando el producto aunque falle la eliminación
+      }
     }
 
     // Actualizar producto

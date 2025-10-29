@@ -18,8 +18,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estáticos (imágenes de productos)
-app.use('/uploads', express.static('uploads'));
+// Las imágenes ahora se sirven desde Cloudinary
+// Si necesitas acceder a imágenes antiguas locales, descomenta la línea siguiente:
+// app.use('/uploads', express.static('uploads'));
 
 // Conectar a la base de datos
 connectDB();
